@@ -2,7 +2,7 @@ define [], () ->
 
     class Heartbeat
         constructor: () ->
-            # Cross-browser/backwards-compatible support
+            # Polyfill courtesy of Paul Irish
             requestAnimFrame = window.requestAnimationFrame       ||
                                window.webkitRequestAnimationFrame ||
                                window.mozRequestAnimationFrame    ||
