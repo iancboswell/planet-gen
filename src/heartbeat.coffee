@@ -2,16 +2,16 @@ define [], () ->
 
     class Heartbeat
         constructor: ->
-            # requestAnimationFrame polyfill, courtesy of Paul Irish
-            window.requestAnimFrame = ->
-                return window.requestAnimationFrame       ||
-                       window.webkitRequestAnimationFrame ||
-                       window.mozRequestAnimationFrame    ||
-                       (callback) ->
-                           window.setTimeout(callback, 1000 / 60)
+            # Cross-browser/backwards-compatible support
+            requestAnimFrame = window.requestAnimationFrame       ||
+                               window.webkitRequestAnimationFrame ||
+                               window.mozRequestAnimationFrame
+            window.requestAnimationFrame = requestAnimFrame
 
-        tick: ->
-            requestAnimFrame(tick)
-            # render
+            window.requestAnimationFrame(@beat)
+
+        beat: (time) =>
+            console.log time
+            window.requestAnimationFrame(@beat)
 
     return Heartbeat
