@@ -19,7 +19,7 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
         planetMaterial = new Three.MeshPhongMaterial {color: 0xffffff, vertexColors: THREE.VertexColors}
         # Faces in THREE.js are indexed using letters
         faceIndices = ['a', 'b', 'c', 'd']
-        DETAIL = 128
+        DETAIL = 256
         planetGeometry = new Three.SphereGeometry 500, DETAIL, DETAIL
 
         OCEAN = Math.random() - .5
@@ -36,12 +36,12 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
                 perlinNoise += OCEAN
                 if perlinNoise < 0
                     # Water
-                    B = 1 + perlinNoise
+                    B = 1 + perlinNoise / 1.5
                 else
                     # Land
-                    R = Math.pow(perlinNoise + .1, 3)
+                    R = Math.pow(perlinNoise + .25, 2)
                     G = Math.sin(perlinNoise * Math.PI / 2) / 1.5 + Math.cos(perlinNoise * Math.PI / 4 + Math.PI / 4) / 2
-                    B = Math.cos(perlinNoise * Math.PI / 2) / 6 #Math.pow(perlinNoise, 3)
+                    B = Math.cos(perlinNoise * Math.PI / 2) / 8
                 color.setRGB R, G, B
                 face.vertexColors[i] = color
 
