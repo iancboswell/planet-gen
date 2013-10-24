@@ -12,31 +12,36 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
     @run = ->
         @heartbeat = new Heartbeat true
         @visual = new Visual document.getElementById("renderBox")
-        @Perlin = new Random.Perlin
+        @Perlin = new Random.Perlin 4, 4
 
         # Planet material allows us to change color of vertices
         planetMaterial = new Three.MeshPhongMaterial {color: 0xffffff, vertexColors: THREE.VertexColors}
         # Faces in THREE.js are indexed using letters
         faceIndices = ['a', 'b', 'c', 'd']
-        planetGeometry = new Three.SphereGeometry 500, 64, 64
+        DETAIL = 256
+        planetGeometry = new Three.SphereGeometry 500, DETAIL, DETAIL
+
+        OCEAN = Math.random() - .5
+
         for face in planetGeometry.faces
-            # Is current face tri or quad?
-            numSides = if face instanceof Three.Face3 then 3 else 4
-            # Each vertex will get a pretty color
-            for i in [0...numSides]
+            for i in [0...3]
                 vertexIndex = face[faceIndices[i]]
                 vertex = planetGeometry.vertices[vertexIndex]
                 color = new Three.Color 0xFFFFFF
-                perlinNoise = Perlin.octaveNoise3 vertex.x / 128, vertex.y / 128, vertex.z / 128
+                perlinNoise = Perlin.octaveNoise3 vertex.x / (DETAIL * (256 / DETAIL)), vertex.y / (DETAIL * (256 / DETAIL)), vertex.z / (DETAIL * (256 / DETAIL))
+                R = 0
+                G = 0
+                B = 0
+                perlinNoise += OCEAN
                 if perlinNoise < 0
                     # Water
-                    color.setRGB 0, 0, 1 + perlinNoise
+                    B = 1 + perlinNoise
                 else
                     # Land
-                    G = perlinNoise
-                    R = Math.pow perlinNoise, 3
-                    B = Math.pow(perlinNoise, 3) / 2
-                    color.setRGB R, G, B
+                    R = Math.pow(perlinNoise + .1, 3)
+                    G = Math.sin(perlinNoise * Math.PI / 2) / 1.5 + Math.cos(perlinNoise * Math.PI / 4 + Math.PI / 4) / 2
+                    B = Math.cos(perlinNoise * Math.PI / 2) / 6 #Math.pow(perlinNoise, 3)
+                color.setRGB R, G, B
                 face.vertexColors[i] = color
 
         @planet = visual.addSphere(planetGeometry, planetMaterial)
