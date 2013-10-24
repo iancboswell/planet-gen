@@ -24,6 +24,8 @@ define ['three'], (Three) ->
         addCube: (geometry, material) ->
             if not geometry?
                 geometry = new Three.CubeGeometry 200, 200, 200
+            if geometry[0]?
+                geometry = new Three.CubeGeometry geometry[0], geometry[1], geometry[2]
             if not material?
                 material = new Three.MeshBasicMaterial {color: 0xff0000, wireframe: true}
             mesh = new Three.Mesh geometry, material
@@ -34,8 +36,9 @@ define ['three'], (Three) ->
         addSphere: (geometry, material) ->
             if not geometry?
                 # radius, segments, rings
-                # TODO: allow passing an array instead of a Three.SphereGeometry
                 geometry = new Three.SphereGeometry 500, 16, 16
+            if geometry[0]?
+                geometry = new Three.SphereGeometry geometry[0], geometry[1], geometry[2]
             if not material?
                 material = new Three.MeshBasicMaterial {color: 0x00ff00, wireframe: true}
             sphere = new Three.Mesh geometry,

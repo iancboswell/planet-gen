@@ -23,6 +23,11 @@
 # Here is Ken Perlin's reference implentation:
 #
 # http://mrl.nyu.edu/~perlin/noise/
+#
+#
+# An excellent article on generating procedural worlds:
+#
+# http://www.gamasutra.com/view/feature/131507/a_realtime_procedural_universe_.php
 
 define [], () ->
     class IntegerNoise
@@ -157,7 +162,7 @@ define [], () ->
         # Each input point will always return the same perlin noise, unless
         # the permutation table is recalculated.
 
-        constructor: (@octaves=4, @persistence=4) ->
+        constructor: (@octaves=4, @roughness=.5, @lacunarity=2) ->
             # Gradient table
             @grad2 = [[1, 1], [0, 1], [1, 0], [-1, -1], [0, -1], [-1, 0], [-1, 1], [1, -1]]
             @grad3 = [[1,1,0], [-1,1,0], [1,-1,0], [-1,-1,0], [1,0,1], [-1,0,1],
@@ -186,8 +191,8 @@ define [], () ->
 
         getPerm: (p) ->
             P = @perm[p & 255]
-            if not P and P isnt 0
-                console.debug p, P
+            #if not P and P isnt 0
+            #    console.debug p, P
             P
 
         noise2: (x, y, offset=0) ->
@@ -288,7 +293,10 @@ define [], () ->
 
             lerpxyz
 
-        octaveNoise2: (x, y) ->
+        # Fractal Brownian motion takes several noise functions and layers them
+        # on top of each other, decreasing amplitude according to the
+        # roughness constant and increasing frequency by the lacunarity constant.
+        fBm2: (x, y) ->
             total = @noise2 x, y
             if @octaves > 1
                 for o in [1..@octaves - 1]
@@ -296,11 +304,15 @@ define [], () ->
                     total += @noise2(x * @persistence * o, y * @persistence * o, o) / (@persistence * o)
             total
 
-        octaveNoise3: (x, y, z) ->
+        fBm3: (x, y, z) ->
             total = @noise3 x, y, z
             if @octaves > 1
                 for o in [1..@octaves - 1]
-                    total += @noise3(x * @persistence * o, y * @persistence * o, z * @persistence * o, o) / (@persistence * o)
+                    total += @noise3(x * @roughness * o,
+                                     y * @roughness * o,
+                                     z * @roughness * o
+                                     , o
+                                     ) / (@lacunarity * o)
             total
 
     {IntegerNoise, DiamondSquare, Perlin}
