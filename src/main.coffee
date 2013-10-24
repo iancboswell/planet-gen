@@ -12,19 +12,24 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
     @run = ->
         @heartbeat = new Heartbeat true
         @visual = new Visual document.getElementById("renderBox")
-        @Perlin = new Random.Perlin 4, 4
+        @Perlin = new Random.Perlin 8, .3
 
         # Planet material allows us to change color of vertices
         # TODO: set specular map to only reflect from ocean
         planetMaterial = new Three.MeshPhongMaterial {color: 0xffffff, vertexColors: THREE.VertexColors}
         # Faces in THREE.js are indexed using letters
         faceIndices = ['a', 'b', 'c', 'd']
+        RADIUS = 500
         DETAIL = 256
-        planetGeometry = new Three.SphereGeometry 500, DETAIL, DETAIL
+        planetGeometry = new Three.SphereGeometry RADIUS, DETAIL, DETAIL
 
         OCEAN = Math.random() - .5
 
-        for face in planetGeometry.faces
+        f25 = Math.floor(planetGeometry.faces.length / 4)
+        f50 = Math.floor(planetGeometry.faces.length / 2)
+        f75 = Math.floor(planetGeometry.faces.length * .75)
+        console.debug "Generating planet."
+        for face, iFace in planetGeometry.faces
             for i in [0...3]
                 vertexIndex = face[faceIndices[i]]
                 vertex = planetGeometry.vertices[vertexIndex]
@@ -33,7 +38,8 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
                 R = 0
                 G = 0
                 B = 0
-                perlinNoise += OCEAN
+                # Raise or lower the noise to the height of the ocean
+                perlinNoise -= OCEAN
                 if perlinNoise < 0
                     # Water
                     B = 1 + perlinNoise / 1.5
@@ -44,6 +50,34 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
                     B = Math.cos(perlinNoise * Math.PI / 2) / 8
                 color.setRGB R, G, B
                 face.vertexColors[i] = color
+
+                # Raise/lower
+                # First determine the unit-length direction vector of the vertex
+                unitVector = [vertex.x / RADIUS, vertex.y / RADIUS, vertex.z / RADIUS]
+                pointRadius = perlinNoise + RADIUS
+
+                vertex.x = pointRadius * unitVector[0]
+                vertex.y = pointRadius * unitVector[1]
+                vertex.z = pointRadius * unitVector[2]
+                #if Math.random() < .01
+                #    console.log "Vertex on face #{i} of #{planetGeometry.faces.length}"
+                #    console.log unitVector, perlinNoise, pointRadius
+                #    console.log vertex.x, vertex.y, vertex.z
+            #document.getElementById("statusbar").value = Math.floor((iFace / planetGeometry.faces.length) * 100)
+            if iFace is f25
+                console.debug "25% completed."
+            if iFace is f50
+                console.debug "50% completed."
+            if iFace is f75
+                console.debug "75% completed."
+
+        #document.getElementById("statusbar").value = 100
+        console.debug "Planet generated."
+
+        # This is necessary if we want to change vertex positions after the
+        # sphere has been created.
+        #visual.meshes[0].geometry.verticesNeedUpdate = true
+
 
         @planet = visual.addSphere(planetGeometry, planetMaterial)
 
@@ -63,7 +97,7 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
             vertex.z += perlinNoise * 15
             vertex.y += perlinNoise * 15
             vertex.x += perlinNoise * 15
-        visual.meshes[0].geometry.verticesNeedUpdate = true###
+        ###
 
         heartbeat.addSystem debugClock
         heartbeat.addSystem rotate

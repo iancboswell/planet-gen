@@ -308,11 +308,15 @@ define [], () ->
             total = @noise3 x, y, z
             if @octaves > 1
                 for o in [1..@octaves - 1]
-                    total += @noise3(x * @roughness * o,
-                                     y * @roughness * o,
-                                     z * @roughness * o
+                    total += @noise3(x * (1 / @roughness) * o,
+                                     y * (1 / @roughness) * o,
+                                     z * (1 / @roughness) * o
                                      , o
                                      ) / (@lacunarity * o)
             total
+
+        expfBm3: (x, y, z) ->
+            total = fBm3(x, y, z)
+            Math.pow(fBm3(x, y, z), 2 + total)
 
     {IntegerNoise, DiamondSquare, Perlin}
