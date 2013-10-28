@@ -17,6 +17,7 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
         # Planet material allows us to change color of vertices
         # TODO: set specular map to only reflect from ocean
         planetMaterial = new Three.MeshPhongMaterial {color: 0xffffff, vertexColors: THREE.VertexColors}
+        #oceanMaterial = new Three.MeshPhongMaterial {color:0x0000FF}
         # Faces in THREE.js are indexed using letters
         faceIndices = ['a', 'b', 'c', 'd']
         RADIUS = 500
@@ -24,6 +25,7 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
         planetGeometry = new Three.SphereGeometry RADIUS, DETAIL, DETAIL
 
         OCEAN = Math.random() - .5
+        #visual.addSphere [RADIUS + OCEAN, DETAIL, DETAIL], oceanMaterial
 
         f25 = Math.floor(planetGeometry.faces.length / 4)
         f50 = Math.floor(planetGeometry.faces.length / 2)
@@ -45,9 +47,9 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
                     B = 1 + perlinNoise / 1.5
                 else
                     # Land
-                    R = Math.pow(perlinNoise + .25, 2)
+                    R = Math.pow(perlinNoise + .25, 2) / 1.5
                     G = Math.sin(perlinNoise * Math.PI / 2) / 1.5 + Math.cos(perlinNoise * Math.PI / 4 + Math.PI / 4) / 2
-                    B = Math.cos(perlinNoise * Math.PI / 2) / 8
+                    B = Math.cos(perlinNoise * Math.PI / 2) / 8 + Math.pow(perlinNoise + .25, 2) / 2
                 color.setRGB R, G, B
                 face.vertexColors[i] = color
 
