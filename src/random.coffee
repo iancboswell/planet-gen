@@ -227,8 +227,8 @@ define [], () ->
             n11 = @dot @grad2[g11], x - 1, y - 1
 
             # Ease curves for x and y
-            u = @fade x
-            v = @fade y
+            u = @ease x
+            v = @ease y
 
             # Interpolate along x contributions from each corner
             lerpx0 = @lerp n00, n10, u
@@ -301,7 +301,10 @@ define [], () ->
             if @octaves > 1
                 for o in [1..@octaves - 1]
                     # Each octave has a different offset, changing the gradients
-                    total += @noise2(x * @persistence * o, y * @persistence * o, o) / (@persistence * o)
+                    total += @noise2(x * (1 / @roughness) * o,
+                                     y * (1 / @roughness) * o,
+                                     o
+                                     ) / (@lacunarity * o)
             total
 
         fBm3: (x, y, z) ->
@@ -310,8 +313,8 @@ define [], () ->
                 for o in [1..@octaves - 1]
                     total += @noise3(x * (1 / @roughness) * o,
                                      y * (1 / @roughness) * o,
-                                     z * (1 / @roughness) * o
-                                     , o
+                                     z * (1 / @roughness) * o,
+                                     o
                                      ) / (@lacunarity * o)
             total
 

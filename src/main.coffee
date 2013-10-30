@@ -48,7 +48,7 @@ define ['cs!src/heartbeat', 'cs!src/visual', 'cs!src/random', 'three'], (Heartbe
                 else
                     # Land
                     R = Math.pow(perlinNoise + .25, 2) / 1.5
-                    G = Math.sin(perlinNoise * Math.PI / 2) / 1.5 + Math.cos(perlinNoise * Math.PI / 4 + Math.PI / 4) / 2
+                    G = Math.sin(perlinNoise * Math.PI / 2) / 1.5 + Math.cos(perlinNoise * Math.PI / 4 + Math.PI / 4) / 2 + Math.pow(perlinNoise + .25, 2) / 4
                     B = Math.cos(perlinNoise * Math.PI / 2) / 8 + Math.pow(perlinNoise + .25, 2) / 2
                 color.setRGB R, G, B
                 face.vertexColors[i] = color
